@@ -1,0 +1,14 @@
+{
+  "name": "@rezi/ats-checker-sdk",
+  "version": "1.0.0",
+  "description": "Rezi ATS Resume Checker SDK - CDN distribution",
+  "main": "rezi-ats-checker.min.js",
+  "jsdelivr": "rezi-ats-checker.min.js",
+  "unpkg": "rezi-ats-checker.min.js",
+  "style": "rezi-ats-checker.css",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rezi-io/rezi-ats-checker-sdk-public.git"
+  },
+  "license": "UNLICENSED"
+}

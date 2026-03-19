@@ -1,0 +1,2338 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Source+Sans+3:wght@400;600;700&display=swap');
+
+/* =============================================================================
+   rezi-ats-checker.css
+   Rezi ATS Checker SDK Stylesheet
+   Namespace: rac- (Rezi ATS Checker)
+   ============================================================================= */
+
+/* =============================================================================
+   SECTION 1: CSS VARIABLES
+   All design tokens scoped to .rac-checker to avoid host page conflicts.
+   ============================================================================= */
+
+.rac-checker {
+  /* ── Colors: Primary ── */
+  --rac-primary: #4d70eb;
+  --rac-primary-hover: #3b5edc;
+  --rac-primary-light: #eef2ff;
+  --rac-primary-mid: #c7d2fb;
+
+  /* ── Colors: Semantic ── */
+  --rac-success: #22c55e;
+  --rac-success-hover: #16a34a;
+  --rac-success-light: #f0fdf4;
+  --rac-warning: #f59e0b;
+  --rac-warning-light: #fffbeb;
+  --rac-error: #ef4444;
+  --rac-error-light: #fef2f2;
+
+  /* ── Colors: Gray Scale ── */
+  --rac-gray-50: #f9fafb;
+  --rac-gray-100: #f3f4f6;
+  --rac-gray-200: #e5e7eb;
+  --rac-gray-300: #d1d5db;
+  --rac-gray-400: #9ca3af;
+  --rac-gray-500: #6b7280;
+  --rac-gray-600: #4b5563;
+  --rac-gray-700: #374151;
+  --rac-gray-800: #1f2937;
+  --rac-gray-900: #111827;
+
+  /* ── Colors: Base ── */
+  --rac-white: #ffffff;
+  --rac-black: #000000;
+
+  /* ── Colors: Score Grades ── */
+  --rac-score-critical: #ef4444;   /* 0–49 */
+  --rac-score-warning: #f59e0b;    /* 50–79 */
+  --rac-score-good: #22c55e;       /* 80–100 */
+
+  /* ── Typography: Font Family ── */
+  --rac-font-family: 'Source Sans 3', 'Source Sans Pro', 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* ── Typography: Font Sizes ── */
+  --rac-font-size-xs: 12px;
+  --rac-font-size-sm: 14px;
+  --rac-font-size-base: 16px;
+  --rac-font-size-lg: 18px;
+  --rac-font-size-xl: 20px;
+  --rac-font-size-2xl: 24px;
+  --rac-font-size-3xl: 30px;
+  --rac-font-size-score: 48px;    /* Score inside circular gauge */
+
+  /* ── Typography: Font Weights ── */
+  --rac-font-weight-normal: 400;
+  --rac-font-weight-medium: 500;
+  --rac-font-weight-semibold: 600;
+  --rac-font-weight-bold: 700;
+
+  /* ── Typography: Line Heights ── */
+  --rac-line-height-tight: 1.25;
+  --rac-line-height-normal: 1.5;
+  --rac-line-height-relaxed: 1.75;
+
+  /* ── Spacing ── */
+  --rac-space-1: 4px;
+  --rac-space-2: 8px;
+  --rac-space-3: 12px;
+  --rac-space-4: 16px;
+  --rac-space-5: 20px;
+  --rac-space-6: 24px;
+  --rac-space-8: 32px;
+  --rac-space-10: 40px;
+  --rac-space-12: 48px;
+
+  /* ── Layout ── */
+  --rac-max-width: 1426px;
+
+  /* ── Border Radius ── */
+  --rac-border-radius: 12px;
+  --rac-border-radius-sm: 8px;
+  --rac-border-radius-xs: 6px;
+  --rac-border-radius-full: 9999px;
+
+  /* ── Borders ── */
+  --rac-border-width: 1px;
+  --rac-border-color: var(--rac-gray-200);
+
+  /* ── Shadows ── */
+  --rac-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --rac-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --rac-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --rac-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+
+  /* ── Transitions ── */
+  --rac-transition-fast: 150ms ease;
+  --rac-transition-normal: 250ms ease;
+  --rac-transition-slow: 350ms ease;
+  --rac-transition-score: 1500ms ease-out;   /* Score count-up animation */
+  --rac-transition-gauge: 1200ms ease-out;   /* Circular gauge fill animation */
+
+  /* ── Z-index ── */
+  --rac-z-dropdown: 10;
+  --rac-z-overlay: 50;
+  --rac-z-toast: 100;
+
+  /* ── Score Gauge ── */
+  --rac-gauge-size: 160px;
+  --rac-gauge-stroke-width: 10px;
+  --rac-gauge-bg-stroke: var(--rac-gray-200);
+  --rac-gauge-track-color: currentColor;    /* Set dynamically by JS based on grade */
+}
+
+
+/* =============================================================================
+   SECTION 2: BASE RESET & CONTAINER
+   ============================================================================= */
+
+/* Universal box-sizing reset scoped to widget */
+.rac-checker *,
+.rac-checker *::before,
+.rac-checker *::after {
+  box-sizing: border-box;
+}
+
+/* Main container */
+.rac-checker {
+  font-family: var(--rac-font-family);
+  font-size: var(--rac-font-size-base);
+  color: var(--rac-gray-900);
+  line-height: var(--rac-line-height-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  max-width: var(--rac-max-width);
+  margin: 0 auto;
+  padding: 0 var(--rac-space-4);
+}
+
+
+
+/* =============================================================================
+   SECTION 3: CARD
+   White surface that wraps the full widget content.
+   ============================================================================= */
+
+.rac-card {
+  background: var(--rac-white);
+  border: var(--rac-border-width) solid var(--rac-border-color);
+  border-radius: var(--rac-border-radius);
+  box-shadow: var(--rac-shadow-lg);
+  overflow: hidden;
+}
+
+
+/* =============================================================================
+   SECTION 4: HEADER
+   Title and subtitle at the top of the card.
+   ============================================================================= */
+
+.rac-header {
+  padding: var(--rac-space-6);
+  border-bottom: var(--rac-border-width) solid var(--rac-border-color);
+}
+
+.rac-title {
+  font-size: var(--rac-font-size-2xl);
+  font-weight: var(--rac-font-weight-bold);
+  color: var(--rac-gray-900);
+  margin: 0;
+  line-height: var(--rac-line-height-tight);
+}
+
+.rac-subtitle {
+  font-size: var(--rac-font-size-base);
+  color: var(--rac-gray-500);
+  margin: var(--rac-space-2) 0 0;
+  line-height: var(--rac-line-height-normal);
+}
+
+/* Label used throughout the widget */
+.rac-label {
+  font-size: var(--rac-font-size-sm);
+  font-weight: var(--rac-font-weight-semibold);
+  color: var(--rac-gray-700);
+  margin-bottom: var(--rac-space-2);
+  display: block;
+}
+
+/* Small muted helper text */
+.rac-text-sm {
+  font-size: var(--rac-font-size-sm);
+  color: var(--rac-gray-500);
+}
+
+
+/* =============================================================================
+   SECTION 5: UPLOAD ZONE
+   Drag-and-drop file target with idle, hover, dragover, and has-file states.
+   ============================================================================= */
+
+.rac-upload-zone {
+  border: 2px dashed #e2e8f0;
+  border-radius: var(--rac-border-radius-xs);
+  padding: var(--rac-space-6) var(--rac-space-4);
+  min-height: 256px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--rac-transition-normal),
+              background var(--rac-transition-normal);
+  background: transparent;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rac-space-2);
+}
+
+/* Hover and drag-over: blue highlight */
+.rac-upload-zone:hover,
+.rac-upload-zone.dragover {
+  border-color: var(--rac-primary);
+  background: var(--rac-primary-light);
+}
+
+/* File ready state: keep dashed border, no green, compact height, content centered */
+.rac-upload-zone.has-file {
+  min-height: unset;
+  padding: var(--rac-space-4) var(--rac-space-4);
+  cursor: default;
+  justify-content: center;
+}
+
+/* Prevent hover highlight in has-file state */
+.rac-upload-zone.has-file:hover {
+  border-color: #e2e8f0;
+  background: transparent;
+}
+
+/* Document icon inside the drop zone */
+.rac-upload-icon {
+  font-size: var(--rac-font-size-2xl);
+  color: var(--rac-primary);
+  display: block;
+  line-height: 1;
+  transition: color var(--rac-transition-normal);
+}
+
+.rac-upload-zone.dragover .rac-upload-icon {
+  color: var(--rac-primary-hover);
+}
+
+/* Text container: flex column, centered, gap between heading and hint */
+.rac-upload-text-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rac-space-1);
+  width: 100%;
+}
+
+/* Primary upload prompt: "Upload your resume or drag and drop" */
+.rac-upload-heading {
+  margin: 0;
+  font-size: var(--rac-font-size-base);
+  line-height: 1.5;
+  color: var(--rac-gray-500);
+}
+
+.rac-upload-heading strong {
+  font-weight: var(--rac-font-weight-semibold);
+  color: var(--rac-primary);
+}
+
+/* Hint below prompt ("PDF, DOCX up to 5MB") */
+.rac-upload-hint {
+  margin: 0;
+  font-size: var(--rac-font-size-sm);
+  line-height: 1.43;
+  color: var(--rac-gray-500);
+}
+
+/* File info row displayed after file selection */
+.rac-file-info {
+  display: flex;
+  align-items: center;
+  gap: var(--rac-space-3);
+  flex: 1;
+  min-width: 0;
+}
+
+.rac-file-icon {
+  font-size: var(--rac-font-size-xl);
+  color: var(--rac-success);
+  flex-shrink: 0;
+}
+
+.rac-file-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.rac-file-name {
+  font-size: var(--rac-font-size-sm);
+  font-weight: var(--rac-font-weight-medium);
+  color: var(--rac-gray-800);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rac-file-size {
+  font-size: var(--rac-font-size-xs);
+  color: var(--rac-gray-500);
+  margin-top: 2px;
+}
+
+/* Remove file button */
+.rac-file-remove {
+  background: none;
+  border: none;
+  color: var(--rac-gray-400);
+  cursor: pointer;
+  font-size: var(--rac-font-size-lg);
+  padding: var(--rac-space-1);
+  line-height: 1;
+  border-radius: var(--rac-border-radius-xs);
+  flex-shrink: 0;
+  transition: color var(--rac-transition-fast),
+              background var(--rac-transition-fast);
+}
+
+.rac-file-remove:hover {
+  color: var(--rac-error);
+  background: var(--rac-error-light);
+}
+
+/* Uploading state: light gray background, spinner */
+.rac-upload-zone.uploading {
+  background: #f1f5f9;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* CSS-only circular spinner */
+.rac-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e2e8f0;
+  border-top-color: var(--rac-primary);
+  border-radius: 50%;
+  animation: rac-spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes rac-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* "Uploading your resume" text */
+.rac-upload-uploading-text {
+  font-family: var(--rac-font-family);
+  font-size: var(--rac-font-size-base);
+  line-height: 1.5;
+  color: var(--rac-gray-500);
+  text-align: center;
+}
+
+/* File ready state: icon + filename row */
+.rac-upload-file-row {
+  display: flex;
+  align-items: center;
+  gap: var(--rac-space-2);
+  white-space: nowrap;
+}
+
+.rac-upload-file-icon {
+  font-size: var(--rac-font-size-2xl);  /* 24px */
+  color: var(--rac-primary);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.rac-upload-filename {
+  margin: 0;
+  font-family: var(--rac-font-family);
+  font-size: var(--rac-font-size-base);
+  font-weight: var(--rac-font-weight-semibold);
+  color: var(--rac-gray-900);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* =============================================================================
+   SECTION 6: JOB DESCRIPTION INPUT
+   Choice list item pattern — collapsible with briefcase icon and chevron.
+   ============================================================================= */
+
+/* =====  JD SECTION — Choice list item pattern  ===== */
+
+.rac-jd-section {
+  border: 1px solid #e2e8f0;
+  border-radius: var(--rac-border-radius-xs);
+  overflow: hidden;
+  background: var(--rac-white);
+}
+
+.rac-jd-header {
+  display: flex;
+  align-items: center;
+  gap: var(--rac-space-2);
+  padding: var(--rac-space-4);
+  cursor: pointer;
+  user-select: none;
+}
+
+.rac-jd-header:hover,
+.rac-jd-section.expanded {
+  background: #f8fafc !important;
+}
+
+/* Icon: briefcase */
+.rac-jd-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: 20px;
+  color: var(--rac-primary);
+  flex-shrink: 0;
+}
+
+/* Label container */
+.rac-jd-label {
+  flex: 1;
+  font-family: var(--rac-font-family);
+  font-size: var(--rac-font-size-base);
+  font-weight: var(--rac-font-weight-semibold);
+  line-height: 1.5;
+  color: var(--rac-gray-900);
+  white-space: nowrap;
+}
+
+.rac-jd-label-sub {
+  font-weight: var(--rac-font-weight-normal);
+  color: var(--rac-gray-500);
+}
+
+/* Chevron icon */
+.rac-jd-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+  color: var(--rac-gray-900);
+  flex-shrink: 0;
+  transition: transform var(--rac-transition-normal);
+}
+
+/* Expanded: rotate chevron */
+.rac-jd-section.expanded .rac-jd-chevron {
+  transform: rotate(180deg);
+}
+
+/* Collapsible content wrapper — slides down when expanded */
+.rac-jd-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease;
+}
+
+.rac-jd-section.expanded .rac-jd-content {
+  max-height: 400px;
+}
+
+/* Wrapper inside content: textarea + helper text */
+.rac-jd-textarea-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 var(--rac-space-4) var(--rac-space-4);
+}
+
+/* Textarea for pasting job description */
+.rac-jd-textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--rac-space-2) var(--rac-space-3);
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  font-family: var(--rac-font-family);
+  font-size: var(--rac-font-size-base);
+  color: var(--rac-gray-800);
+  resize: vertical;
+  min-height: 120px;
+  outline: none;
+  background: var(--rac-white);
+  transition: border-color var(--rac-transition-fast);
+}
+
+.rac-jd-textarea::placeholder {
+  color: var(--rac-gray-300);
+}
+
+.rac-jd-textarea:focus {
+  border: 2px solid var(--rac-primary);
+}
+
+/* Helper text below textarea */
+.rac-jd-helper-text {
+  margin: 0;
+  font-size: var(--rac-font-size-xs);
+  line-height: 16px;
+  color: var(--rac-gray-500);
+}
+
+/* Character limit warning */
+.rac-jd-char-warning {
+  margin: 0;
+  font-size: var(--rac-font-size-xs);
+  line-height: 16px;
+  color: #ef4444;
+}
+
+.rac-jd-textarea--limit {
+  border-color: #ef4444 !important;
+  border-width: 2px !important;
+}
+
+/* === DISABLED STATE === */
+.rac-jd-section.disabled {
+  background: #e5e5e5;
+  border-color: #d4d4d4;
+  pointer-events: none;
+}
+
+.rac-jd-section.disabled .rac-jd-header {
+  cursor: not-allowed;
+}
+
+.rac-jd-section.disabled .rac-jd-icon {
+  color: #d4d4d4;
+}
+
+.rac-jd-section.disabled .rac-jd-label {
+  color: #d4d4d4;
+}
+
+.rac-jd-section.disabled .rac-jd-label-sub {
+  color: #d4d4d4;
+}
+
+.rac-jd-section.disabled .rac-jd-chevron {
+  color: #d4d4d4;
+}
+
+
+/* =============================================================================
+   SECTION 7: SCAN BUTTON SECTION
+   Wraps the primary action button to trigger ATS analysis.
+   ============================================================================= */
+
+.rac-scan-section {
+  padding: var(--rac-space-5) var(--rac-space-6);
+  border-top: var(--rac-border-width) solid var(--rac-gray-100);
+}
+
+/* Form body area (upload + JD input) */
+.rac-form-body {
+  padding: var(--rac-space-6);
+}
+
+/* Upload container — single flex column holding drop zone, JD row, and scan button */
+.rac-upload-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rac-space-6);  /* 24px gap between drop zone, JD row, button */
+  width: 100%;
+  padding: var(--rac-space-6);
+}
+
+/* Primary action button */
+.rac-btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: var(--rac-border-radius-xs);
+  background: var(--rac-primary);
+  color: var(--rac-white);
+  font-family: var(--rac-font-family);
+  font-size: var(--rac-font-size-sm);  /* 14px */
+  font-weight: var(--rac-font-weight-bold);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--rac-transition-normal);
+  min-width: 64px;
+}
+
+.rac-btn-primary:hover:not(:disabled) {
+  background: var(--rac-primary-hover);
+}
+
+.rac-btn-primary:disabled,
+.rac-btn-primary[aria-disabled="true"] {
+  background: #e5e5e5;
+  color: #d4d4d4;
+  cursor: not-allowed;
+}
+
+
+/* =============================================================================
+   SECTION 8: SCANNING ANIMATION
+   Full-card state shown while ATS analysis is in progress.
+   Matches Figma node 2011-3539.
+   ============================================================================= */
+
+/* ── Scanning header ── */
+.rac-scanning-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rac-space-2);
+  padding: var(--rac-space-4) var(--rac-space-6);
+  background: var(--rac-white);
+  border: var(--rac-border-width) solid var(--rac-border-color);
+  border-radius: var(--rac-border-radius-xs);
+}
+
+.rac-scanning-header-left {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rac-space-1);
+}
+
+.rac-scanning-header-icon {
+  font-size: 20px;
+  color: var(--rac-primary);
+  width: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rac-scanning-header-title {
+  font-size: var(--rac-font-size-lg);   /* 18px */
+  font-weight: var(--rac-font-weight-semibold);
+  color: var(--rac-gray-900);
+  line-height: 28px;
+}
+
+/* "Scan Another Resume" button — disabled during scanning, enabled in report */
+.rac-btn-scan-another {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;                              /* 1px gap + 4px label indent from Figma */
+  height: 32px;
+  min-width: 56px;
+  padding: 0 var(--rac-space-3) 0 8px;  /* left: 8px (4px outer + 4px inner) */
+  border: var(--rac-border-width) solid #e2e8f0;
+  border-radius: var(--rac-border-radius-xs);
+  background: transparent;
+  color: #94a3b8;
+  font-family: var(--rac-font-family);
+  font-size: 12px !important;
+  font-weight: var(--rac-font-weight-bold);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  cursor: not-allowed;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.rac-btn-scan-another i {
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.rac-btn-scan-another:not(:disabled) {
+  border-color: #cbd5e1;
+  color: var(--rac-gray-900);
+  cursor: pointer;
+}
+
+.rac-btn-scan-another:not(:disabled) i {
+  color: var(--rac-gray-900);
+}
+
+.rac-btn-scan-another:not(:disabled):hover {
+  background: var(--rac-gray-50);
+}
+
+/* ── Scanning body: large centered area ── */
+.rac-scanning-body {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  background: var(--rac-gray-50);
+}
+
+/* Loader + label stacked */
+.rac-scanning-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rac-space-4);   /* 16px */
+}
+
+/* 48px SVG circular indeterminate spinner */
+.rac-circular-loader-lg {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  animation: rac-spin 1.2s linear infinite;
+}
+
+/* "Scanning your resume" label */
+.rac-scanning-label {
+  margin: 0;
+  font-size: var(--rac-font-size-base);   /* 16px */
+  font-weight: var(--rac-font-weight-normal);
+  color: var(--rac-gray-900);
+  line-height: 24px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+
+/* =============================================================================
+   SECTION 9: SCORE DISPLAY
+   Circular SVG gauge + numeric score + grade label.
+   ============================================================================= */
+
+.rac-score-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--rac-space-8) var(--rac-space-6) var(--rac-space-4);
+}
+
+/* Gauge wrapper — overflow: visible so the indicator dot is never clipped */
+.rac-gauge-wrapper {
+  position: relative;
+  width: 236px;
+  height: 118px;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+/* Inline SVG arc (ellipse.svg) fills the wrapper */
+.rac-gauge-ellipse-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 236px;
+  height: 118px;
+  pointer-events: none;
+}
+
+.rac-gauge-ellipse-layer svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Indicator dot: absolutely positioned, centered via transform */
+.rac-gauge-dot {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1.5px solid #111827;
+  transform: translate(-50%, -50%);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.10),
+    0 2px 4px -2px rgba(0, 0, 0, 0.10);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Text overlay — score number + grade label, anchored to bottom-center */
+.rac-gauge-text {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  width: 119px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Numeric score (48px semibold — Figma: Source Sans Pro SemiBold 48) */
+.rac-gauge-score {
+  font-size: var(--rac-font-size-score);   /* 48px */
+  font-weight: var(--rac-font-weight-semibold);
+  line-height: 48px;
+  color: var(--rac-gray-900);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Grade label (14px regular gray-500) */
+.rac-grade-label {
+  font-size: var(--rac-font-size-sm);      /* 14px */
+  font-weight: var(--rac-font-weight-normal);
+  color: var(--rac-gray-500);
+  line-height: 20px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* "0" / "100" scale labels below the arc */
+.rac-gauge-scale {
+  display: flex;
+  justify-content: space-between;
+  width: 236px;
+  font-size: var(--rac-font-size-sm);
+  color: var(--rac-gray-500);
+  line-height: 20px;
+  margin-top: 2px;
+}
+
+/* Score summary sub-line (kept for backwards compatibility) */
+.rac-score-summary {
+  font-size: var(--rac-font-size-sm);
+  color: var(--rac-gray-500);
+  margin-top: var(--rac-space-2);
+  text-align: center;
+}
+
+
+/* =============================================================================
+   SECTION 10: ISSUES SUMMARY
+   Highlighted box listing the top failing checks.
+   ============================================================================= */
+
+.rac-issues-summary {
+  background: var(--rac-gray-50);
+  border: var(--rac-border-width) solid var(--rac-gray-200);
+  border-radius: var(--rac-border-radius-sm);
+  padding: var(--rac-space-4);
+  margin: 0 var(--rac-space-6) var(--rac-space-6);
+}
+
+.rac-issues-title {
+  font-size: var(--rac-font-size-base);
+  font-weight: var(--rac-font-weight-semibold);
+  color: var(--rac-gray-800);
+  margin: 0 0 var(--rac-space-3);
+}
+
+/* Individual issue rows inside the summary */
+.rac-issue-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rac-space-2);
+  padding: var(--rac-space-1) 0;
+  font-size: var(--rac-font-size-sm);
+  color: var(--rac-gray-700);
+}
+
+.rac-issue-row:not(:last-child) {
+  border-bottom: 1px solid var(--rac-gray-100);
+  padding-bottom: var(--rac-space-2);
+  margin-bottom: var(--rac-space-1);
+}
+
+.rac-issue-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  font-size: var(--rac-font-size-sm);
+}
+
+
+/* =============================================================================
+   SECTION 11: CATEGORY ACCORDION
+   Expandable category sections with title, score, progress bar, and body.
+   ============================================================================= */
+
+/* Categories wrapper */
+.rac-categories {
+  padding: 0 var(--rac-space-6) var(--rac-space-4);
+}
+
+/* Single category card */
+.rac-category {
+  border: var(--rac-border-width) solid var(--rac-border-color);
+  border-radius: var(--rac-border-radius-sm);
+  margin-bottom: var(--rac-space-3);
+  overflow: hidden;
+  transition: box-shadow var(--rac-transition-fast);
+}
+
+.rac-category:last-child {
+  margin-bottom: 0;
+}
+
+.rac-category.expanded {
+  box-shadow: var(--rac-shadow);
+}
+
+/* Clickable header row */
+.rac-category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--rac-space-4);
+  cursor: pointer;
+  user-select: none;
+  background: var(--rac-white);
+  transition: background var(--rac-transition-fast);
+  gap: var(--rac-space-3);
+}
+
+.rac-category-header:hover {
+  background: var(--rac-gray-50);
+}
+
+/* Left side: icon + category name */
+.rac-category-title {
+  display: flex;
+  align-items: center;
+  gap: var(--rac-space-2);
+  font-size: var(--rac-font-size-sm);
+  font-weight: var(--rac-font-weight-semibold);
+  color: var(--rac-gray-800);
+  flex: 1;
+  min-width: 0;
+}
+
+/* Right side: score text + chevron */
+.rac-category-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--rac-space-3);
+  flex-shrink: 0;
+}
+
+.rac-category-score {
+  font-size: var(--rac-font-size-sm);
+  font-weight: var(--rac-font-weight-medium);
+  color: var(--rac-gray-600);
+  white-space: nowrap;
+}
+
+/* Chevron icon — rotates when expanded */
+.rac-category-arrow {
+  font-size: var(--rac-font-size-sm);
+  color: var(--rac-gray-400);
+  transition: transform var(--rac-transition-fast);
+  flex-shrink: 0;
+}
+
+.rac-category.expanded .rac-category-arrow {
+  transform: rotate(180deg);
+}
+
+/* Progress bar sits between header and body */
+.rac-progress-bar {
+  height: 4px;
+  background: var(--rac-gray-200);
+  overflow: hidden;
+}
+
+.rac-progress-fill {
+  height: 100%;
+  border-radius: 0;
+  transition: width var(--rac-transition-slow);
+  width: 0%;
+}
+
+.rac-progress-fill.critical { background: var(--rac-score-critical); }
+.rac-progress-fill.warning  { background: var(--rac-score-warning); }
+.rac-progress-fill.good     { background: var(--rac-score-good); }
+
+/* Accordion body — hidden by default, slides open when expanded */
+.rac-category-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--rac-transition-slow);
+}
+
+.rac-category.expanded .rac-category-body {
+  max-height: 600px;
+}
+
+
+/* =============================================================================
+   SECTION 12: CHECK ITEMS
+   Individual pass/fail/warning rows inside a category body.
+   ============================================================================= */
+
+.rac-check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rac-space-3);
+  padding: var(--rac-space-3) var(--rac-space-4);
+  border-bottom: 1px solid var(--rac-gray-100);
+  transition: background var(--rac-transition-fast);
+}
+
+.rac-check-item:last-of-type {
+  border-bottom: none;
+}
+
+.rac-check-item:hover {
+  background: var(--rac-gray-50);
+}
+
+/* Status icon (checkmark, cross, or warning) */
+.rac-check-icon {
+  flex-shrink: 0;
+  font-size: var(--rac-font-size-base);
+  margin-top: 1px;
+  line-height: 1;
+}
+
+.rac-check-icon.pass    { color: var(--rac-success); }
+.rac-check-icon.fail    { color: var(--rac-error); }
+.rac-check-icon.warning { color: var(--rac-warning); }
+
+/* Text content area */
+.rac-check-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.rac-check-name {
+  font-size: var(--rac-font-size-sm);
+  font-weight: var(--rac-font-weight-medium);
+  color: var(--rac-gray-800);
+  line-height: var(--rac-line-height-tight);
+}
+
+.rac-check-detail {
+  font-size: var(--rac-font-size-xs);
+  color: var(--rac-gray-500);
+  margin-top: 3px;
+  line-height: var(--rac-line-height-normal);
+}
+
+/* Penalty / outcome label (right-aligned) */
+.rac-check-penalty {
+  flex-shrink: 0;
+  font-size: var(--rac-font-size-xs);
+  font-weight: var(--rac-font-weight-semibold);
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.rac-check-penalty.pass    { color: var(--rac-success); }
+.rac-check-penalty.warning { color: var(--rac-warning); }
+.rac-check-penalty.fail    { color: var(--rac-error); }
+
+
+/* =============================================================================
+   SECTION 13: KEYWORD CHIPS
+   Matched (green) and missing (red) keyword chips shown in JD mode.
+   ============================================================================= */
+
+/* Container for a labeled group of chips */
+.rac-keyword-section {
+  padding: var(--rac-space-3) var(--rac-space-4);
+  border-top: 1px solid var(--rac-gray-100);
+}
+
+.rac-keyword-section-label {
+  font-size: var(--rac-font-size-xs);
+  font-weight: var(--rac-font-weight-semibold);
+  color: var(--rac-gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--rac-space-2);
+  display: block;
+}
+
+/* Flexbox row of chips */
+.rac-keyword-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rac-space-1) var(--rac-space-2);
+  margin-bottom: var(--rac-space-2);
+}
+
+.rac-keyword-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Base chip */
+.rac-keyword-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px var(--rac-space-2);
+  border-radius: var(--rac-border-radius-xs);
+  font-size: var(--rac-font-size-xs);
+  font-weight: var(--rac-font-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+  transition: opacity var(--rac-transition-fast);
+}
+
+/* Keyword found in resume */
+.rac-keyword-chip.matched {
+  background: var(--rac-success-light);
+  color: var(--rac-success);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+/* Keyword missing from resume */
+.rac-keyword-chip.missing {
+  background: var(--rac-error-light);
+  color: var(--rac-error);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+
+/* =============================================================================
+   SECTION 14: CTA SECTION
+   Bottom call-to-action to drive users into Rezi, plus a reset link.
+   ============================================================================= */
+
+.rac-cta-section {
+  padding: var(--rac-space-6) var(--rac-space-6) var(--rac-space-8);
+  text-align: center;
+  border-top: 1px solid var(--rac-gray-100);
+}
+
+/* CTA explainer text above the button */
+.rac-cta-hint {
+  font-size: var(--rac-font-size-sm);
+  color: var(--rac-gray-500);
+  margin-bottom: var(--rac-space-4);
+}
+
+/* Primary CTA button — bolder than rac-btn-primary */
+.rac-btn-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rac-space-2);
+  padding: var(--rac-space-4) var(--rac-space-8);
+  background: var(--rac-primary);
+  color: var(--rac-white);
+  border: none;
+  border-radius: var(--rac-border-radius-sm);
+  font-size: var(--rac-font-size-lg);
+  font-weight: var(--rac-font-weight-bold);
+  cursor: pointer;
+  transition: background var(--rac-transition-fast),
+              box-shadow var(--rac-transition-fast),
+              transform var(--rac-transition-fast);
+  width: 100%;
+  box-shadow: var(--rac-shadow-md);
+  text-decoration: none;
+  line-height: 1.25;
+}
+
+.rac-btn-cta:hover {
+  background: var(--rac-primary-hover);
+  box-shadow: var(--rac-shadow-lg);
+  transform: translateY(-1px);
+}
+
+.rac-btn-cta:active {
+  transform: translateY(0);
+  box-shadow: var(--rac-shadow);
+}
+
+/* Subtle text link below CTA ("Upload another resume") */
+.rac-btn-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rac-space-1);
+  background: none;
+  border: none;
+  color: var(--rac-primary);
+  font-size: var(--rac-font-size-sm);
+  font-weight: var(--rac-font-weight-medium);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: var(--rac-space-2);
+  margin-top: var(--rac-space-3);
+  border-radius: var(--rac-border-radius-xs);
+  transition: color var(--rac-transition-fast),
+              background var(--rac-transition-fast);
+}
+
+.rac-btn-link:hover {
+  color: var(--rac-primary-hover);  
+  background: var(--rac-primary-light); 
+}
+
+/* Reset / "Upload another" action area */
+.rac-cta-reset {
+  margin-top: var(--rac-space-3);
+}
+
+
+/* =============================================================================
+   SECTION 15: ERROR MESSAGE
+   Inline error shown when file processing or analysis fails.
+   ============================================================================= */
+
+.rac-error-message {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rac-space-2);
+  padding: var(--rac-space-3) var(--rac-space-4);
+  background: var(--rac-error-light);
+  border: var(--rac-border-width) solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--rac-border-radius-sm);
+  margin: var(--rac-space-4) var(--rac-space-6);
+  font-size: var(--rac-font-size-sm);
+  color: var(--rac-error);
+  line-height: var(--rac-line-height-normal);
+}
+
+.rac-error-message .rac-error-icon {
+  flex-shrink: 0;
+  font-size: var(--rac-font-size-base);
+  margin-top: 1px;
+}
+
+.rac-error-message .rac-error-text {
+  flex: 1;
+}
+
+.rac-error-message .rac-error-text strong {
+  font-weight: var(--rac-font-weight-semibold);
+  display: block;
+  margin-bottom: 2px;
+}
+
+
+/* =============================================================================
+   SECTION 16: TOAST NOTIFICATIONS
+   Ephemeral status messages that slide in from the bottom.
+   ============================================================================= */
+
+/* Toast host — fixed overlay, does not affect document flow */
+.rac-toast-host {
+  position: fixed;
+  bottom: var(--rac-space-6);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--rac-z-toast);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rac-space-2);
+  pointer-events: none;
+  width: min(400px, calc(100vw - var(--rac-space-8)));
+}
+
+/* Individual toast */
+.rac-toast {
+  display: flex;
+  align-items: center;
+  gap: var(--rac-space-3);
+  padding: var(--rac-space-3) var(--rac-space-4);
+  border-radius: var(--rac-border-radius-sm);
+  font-size: var(--rac-font-size-sm);
+  font-weight: var(--rac-font-weight-medium);
+  box-shadow: var(--rac-shadow-lg);
+  pointer-events: auto;
+  width: 100%;
+  animation: rac-toast-in var(--rac-transition-normal) ease both;
+}
+
+.rac-toast.leaving {
+  animation: rac-toast-out var(--rac-transition-normal) ease both;
+}
+
+/* Toast variants */
+.rac-toast.success {
+  background: var(--rac-success);
+  color: var(--rac-white);
+}
+
+.rac-toast.error {
+  background: var(--rac-error);
+  color: var(--rac-white);
+}
+
+.rac-toast.warning {
+  background: var(--rac-warning);
+  color: var(--rac-white);
+}
+
+.rac-toast.info {
+  background: var(--rac-gray-800);
+  color: var(--rac-white);
+}
+
+.rac-toast-icon {
+  flex-shrink: 0;
+  font-size: var(--rac-font-size-base);
+}
+
+.rac-toast-message {
+  flex: 1;
+  line-height: var(--rac-line-height-tight);
+}
+
+/* Toast enter animation */
+@keyframes rac-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Toast exit animation */
+@keyframes rac-toast-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+
+/* =============================================================================
+   SECTION 17: STATUS BADGE CLASSES (reusable)
+   ============================================================================= */
+
+.rac-status-pass    { color: var(--rac-success); }
+.rac-status-fail    { color: var(--rac-error); }
+.rac-status-warning { color: var(--rac-warning); }
+
+.rac-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rac-space-1);
+  padding: 2px var(--rac-space-2);
+  border-radius: var(--rac-border-radius-full);
+  font-size: var(--rac-font-size-xs);
+  font-weight: var(--rac-font-weight-medium);
+  line-height: 1;
+}
+
+.rac-status-badge.pass {
+  background: var(--rac-success-light);
+  color: var(--rac-success);
+}
+
+.rac-status-badge.fail {
+  background: var(--rac-error-light);
+  color: var(--rac-error);
+}
+
+.rac-status-badge.warning {
+  background: var(--rac-warning-light);
+  color: var(--rac-warning);
+}
+
+
+/* =============================================================================
+   SECTION 18: UTILITY CLASSES
+   ============================================================================= */
+
+/* Completely hidden from layout and AT */
+.rac-hidden {
+  display: none !important;
+}
+
+/* Visually hidden but accessible to screen readers */
+.rac-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Fade-in helper for results sections */
+.rac-fade-in {
+  animation: rac-fade-in var(--rac-transition-normal) ease both;
+}
+
+@keyframes rac-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* =============================================================================
+   SECTION 20: REVIEW LIST
+   ATS review list showing improvement items grouped by category section.
+   ============================================================================= */
+
+/* Card container */
+.rac-review-list {
+  background: var(--rac-white);
+  border: 1px solid #e2e8f0;
+  border-radius: var(--rac-border-radius-sm); /* 8px */
+  overflow: hidden;
+  width: 100%;
+  padding: var(--rac-space-2) 0; /* 8px top/bottom, 0 sides */
+}
+
+/* Body — flex column with no gap (gaps handled by child containers) */
+.rac-review-body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Section header row */
+.rac-review-section-header {
+  display: flex;
+  align-items: center;
+  gap: var(--rac-space-4); /* 16px */
+  min-height: 32px;
+  padding: 4px var(--rac-space-6); /* 4px top/bottom, 24px left/right */
+  background: var(--rac-white);
+  overflow: hidden;
+}
+
+/* Label wrapper inside section header */
+.rac-review-section-label {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 1px;
+}
+
+/* Section title text — SemiBold 16px */
+.rac-review-section-title {
+  font-family: var(--rac-font-family);
+  font-size: var(--rac-font-size-base); /* 16px */
+  font-weight: var(--rac-font-weight-semibold); /* 600 */
+  line-height: 24px;
+  color: var(--rac-gray-900);
+  width: 100%;
+  margin: 0;
+}
+
+/* Container for improvement items under a section */
+.rac-review-improvements {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px var(--rac-space-4); /* 4px top/bottom, 16px left/right */
+}
+
+/* Individual improvement item row */
+.rac-review-item {
+  display: flex;
+  align-items: center;
+  gap: var(--rac-space-2); /* 8px */
+  min-height: 32px;
+  padding: 4px var(--rac-space-2); /* 4px top/bottom, 8px left/right */
+  border-radius: var(--rac-border-radius-xs); /* 6px */
+  background: var(--rac-white);
+  overflow: hidden;
+  transition: background var(--rac-transition-fast);
+}
+
+/* Highlighted item (first item active state, or hover) */
+.rac-review-item.active,
+.rac-review-item:hover {
+  background: #f1f5f9;
+}
+
+/* Icon wrapper — aligns with top of text content */
+.rac-review-item-icon {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  align-self: stretch;
+  flex-shrink: 0;
+}
+
+/* Icon element — circle-xmark, 16px, colored by status */
+.rac-review-icon-el {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--rac-font-size-base); /* 16px */
+  padding-top: 4px;
+  flex-shrink: 0;
+}
+
+/* Status icon colors */
+.rac-review-icon-fail    { color: var(--rac-error); }   /* #ef4444 */
+.rac-review-icon-warning { color: var(--rac-warning); } /* #f59e0b */
+
+/* Content area (label + optional detail) */
+.rac-review-item-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 1px;
+}
+
+/* Row holding the label text */
+.rac-review-item-label-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rac-space-2); /* 8px */
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* Main label — Regular 16px */
+.rac-review-item-label {
+  font-family: var(--rac-font-family);
+  font-size: var(--rac-font-size-base); /* 16px */
+  font-weight: var(--rac-font-weight-normal); /* 400 */
+  line-height: 24px;
+  color: var(--rac-gray-900);
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+/* Truncating variant — used when there is no detail text */
+.rac-review-item-label--truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Detail text — Regular 14px, below the label */
+.rac-review-item-detail {
+  font-family: var(--rac-font-family);
+  font-size: var(--rac-font-size-sm); /* 14px */
+  font-weight: var(--rac-font-weight-normal); /* 400 */
+  line-height: 20px;
+  color: var(--rac-gray-900);
+  width: 100%;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+
+/* =============================================================================
+   SECTION 19: RESPONSIVE BREAKPOINTS
+   ============================================================================= */
+
+/* ── Tablet (≤768px) ── */
+@media (max-width: 768px) {
+  .rac-checker {
+    padding: 0 var(--rac-space-3);
+  }
+
+  .rac-header {
+    padding: var(--rac-space-5);
+  }
+
+  .rac-title {
+    font-size: var(--rac-font-size-xl);
+  }
+
+  .rac-form-body {
+    padding: var(--rac-space-5);
+  }
+
+  .rac-categories {
+    padding: 0 var(--rac-space-4) var(--rac-space-4);
+  }
+
+  .rac-issues-summary {
+    margin: 0 var(--rac-space-4) var(--rac-space-5);
+  }
+
+  .rac-cta-section {
+    padding: var(--rac-space-5) var(--rac-space-5) var(--rac-space-6);
+  }
+
+  .rac-btn-cta {
+    font-size: var(--rac-font-size-base);
+    padding: var(--rac-space-3) var(--rac-space-6);
+  }
+}
+
+/* ── Mobile (≤480px) ── */
+@media (max-width: 480px) {
+  .rac-checker {
+    --rac-space-6: 16px;
+    --rac-space-8: 24px;
+    padding: 0 var(--rac-space-2);
+  }
+
+  /* Scale the entire gauge down on narrow screens — keeps dot positions correct */
+  .rac-gauge-wrapper {
+    transform: scale(0.763);
+    transform-origin: top center;
+    margin-bottom: -27px; /* compensate for height reduction */
+  }
+
+  .rac-gauge-scale {
+    width: 180px;
+  }
+
+  .rac-header {
+    padding: var(--rac-space-4);
+  }
+
+  .rac-title {
+    font-size: var(--rac-font-size-lg);
+  }
+
+  .rac-subtitle {
+    font-size: var(--rac-font-size-sm);
+  }
+
+  .rac-form-body {
+    padding: var(--rac-space-4);
+  }
+
+  .rac-upload-zone {
+    padding: var(--rac-space-6) var(--rac-space-4);
+  }
+
+  .rac-upload-icon {
+    font-size: 36px;
+  }
+
+  .rac-scan-section {
+    padding: var(--rac-space-4);
+  }
+
+  .rac-categories {
+    padding: 0 var(--rac-space-3) var(--rac-space-3);
+  }
+
+  .rac-issues-summary {
+    margin: 0 var(--rac-space-3) var(--rac-space-4);
+  }
+
+  .rac-score-display {
+    padding: var(--rac-space-4) var(--rac-space-3) var(--rac-space-3);
+  }
+
+  .rac-cta-section {
+    padding: var(--rac-space-4) var(--rac-space-4) var(--rac-space-6);
+  }
+
+  .rac-btn-cta {
+    font-size: var(--rac-font-size-sm);
+    padding: var(--rac-space-3) var(--rac-space-4);
+  }
+
+  .rac-category-header {
+    padding: var(--rac-space-3);
+  }
+
+  .rac-check-item {
+    padding: var(--rac-space-2) var(--rac-space-3);
+  }
+
+  .rac-error-message {
+    margin: var(--rac-space-3) var(--rac-space-3);
+  }
+
+  .rac-toast-host {
+    bottom: var(--rac-space-4);
+    width: calc(100vw - var(--rac-space-6));
+  }
+}
+
+/* =============================================================================
+   SECTION: RESUME PREVIEW
+   Compact preview card showing parsed resume data from anon-resumes collection.
+   ============================================================================= */
+
+.rac-resume-preview {
+  border: 1px solid var(--rac-gray-200);
+  border-radius: var(--rac-radius);
+  overflow: hidden;
+  background: var(--rac-white);
+}
+
+.rac-resume-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--rac-space-3) var(--rac-space-4);
+  background: var(--rac-gray-50);
+  border-bottom: 1px solid var(--rac-gray-200);
+}
+
+.rac-resume-preview-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--rac-gray-800);
+}
+
+.rac-resume-preview-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: var(--rac-success-light, #f0fdf4);
+  color: var(--rac-success, #22c55e);
+}
+
+.rac-resume-preview-body {
+  padding: var(--rac-space-4);
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.rac-preview-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--rac-gray-900);
+  margin-bottom: 2px;
+}
+
+.rac-preview-contact {
+  font-size: 0.75rem;
+  color: var(--rac-gray-500);
+  margin-bottom: var(--rac-space-3);
+  word-break: break-all;
+}
+
+.rac-preview-section-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--rac-gray-700);
+  margin-top: var(--rac-space-3);
+  margin-bottom: var(--rac-space-1);
+  padding-bottom: 4px;
+  border-bottom: 1.5px solid var(--rac-gray-200);
+}
+
+.rac-preview-text {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--rac-gray-600);
+  margin: var(--rac-space-1) 0;
+}
+
+.rac-preview-entry {
+  margin-bottom: var(--rac-space-2);
+}
+
+.rac-preview-entry-heading {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--rac-gray-800);
+}
+
+.rac-preview-entry-date {
+  font-size: 0.75rem;
+  color: var(--rac-gray-500);
+  margin-bottom: 2px;
+}
+
+.rac-preview-bullets {
+  margin: 4px 0 0 0;
+  padding-left: 16px;
+  list-style: disc;
+}
+
+.rac-preview-bullets li {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--rac-gray-600);
+  margin-bottom: 1px;
+}
+
+.rac-preview-skills {
+  margin-top: var(--rac-space-1);
+}
+
+.rac-preview-skill-line {
+  font-size: 0.75rem;
+  color: var(--rac-gray-600);
+  line-height: 1.6;
+}
+
+.rac-resume-preview-footer {
+  padding: var(--rac-space-2) var(--rac-space-4);
+  background: var(--rac-primary-light, #eef2ff);
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--rac-primary);
+}
+
+/* =============================================================================
+   SECTION 21: REPORT LAYOUT (two-column)
+   Left: score + issues + categories (308px fixed)
+   Right: resume template preview (flex-1)
+   ============================================================================= */
+
+/* Report phase: override container to flex column with proper padding */
+.rac-checker--report {
+  max-width: 1080px;
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Report phase: card becomes a transparent flex passthrough */
+.rac-card--report {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow: visible;
+  padding: 0;
+}
+
+.rac-report-body {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.rac-report-left {
+  width: 308px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.rac-report-right {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Score card (gauge + CTA button) ── */
+
+.rac-report-score-card {
+  background: var(--rac-white);
+  border: 1px solid var(--rac-border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 0;
+}
+
+/* ── Fix Rezi CTA button (inside score card) ── */
+
+.rac-btn-fix-rezi {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--rac-primary);
+  color: var(--rac-white);
+  border: none;
+  cursor: pointer;
+  font-family: var(--rac-font-family);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14px;
+  line-height: 20px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.rac-btn-fix-rezi:hover {
+  background: var(--rac-primary-hover);
+}
+
+/* ── Top Issues card ── */
+
+.rac-report-issues-card {
+  background: var(--rac-white);
+  border: 1px solid var(--rac-border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 8px 0;
+}
+
+/* ── Categories card ── */
+
+.rac-report-categories-card {
+  background: var(--rac-white);
+  border: 1px solid var(--rac-border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 8px 0;
+}
+
+/* ── Shared: card title ── */
+
+.rac-report-card-title {
+  font-family: var(--rac-font-family);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--rac-gray-900);
+  line-height: 24px;
+  padding: 4px 24px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.rac-report-category-title {
+  font-family: var(--rac-font-family);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--rac-gray-900);
+  line-height: 24px;
+  padding: 4px 24px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Flat list (Figma 2327-443 / 2327-974) ── */
+
+.rac-report-category-row {
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 24px;
+}
+
+.rac-report-category-label {
+  font-family: var(--rac-font-family);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  color: #111827;
+  margin: 0;
+}
+
+.rac-report-category-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px 16px;
+}
+
+.rac-report-flat-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-height: 32px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--rac-white);
+  transition: background 0.15s ease;
+}
+
+.rac-report-flat-item--expandable {
+  cursor: pointer;
+}
+
+.rac-report-flat-item--expandable:hover {
+  background: #f1f5f9;
+}
+
+.rac-report-flat-item--active {
+  background: #f1f5f9;
+}
+
+.rac-report-flat-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.rac-report-flat-icon {
+  display: flex;
+  align-items: flex-start;
+  padding-top: 4px;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.rac-report-flat-icon--pass {
+  color: #14b8a6;
+}
+
+.rac-report-flat-icon--fail {
+  color: #ef4444;
+}
+
+.rac-report-flat-icon--warning {
+  color: #f59e0b;
+}
+
+.rac-report-flat-label {
+  font-family: var(--rac-font-family);
+  font-size: 16px;
+  line-height: 24px;
+  color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0;
+}
+
+/* ── Shared: items list ── */
+
+.rac-report-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px 16px;
+}
+
+.rac-report-item {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  overflow: hidden;
+  transition: background 0.15s ease;
+}
+
+.rac-report-item:hover {
+  background: #f1f5f9;
+}
+
+.rac-report-item--active {
+  background: #f1f5f9;
+}
+
+.rac-report-item-icon {
+  flex-shrink: 0;
+  align-self: flex-start;
+  padding-top: 4px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.rac-report-item-icon--fail {
+  color: #ef4444;
+}
+
+.rac-report-item-icon--warning {
+  color: #f59e0b;
+}
+
+.rac-report-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.rac-report-item-name {
+  font-family: var(--rac-font-family);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--rac-gray-900);
+  line-height: 24px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0;
+}
+
+/* Accordion: grid-template-rows trick for smooth height animation */
+.rac-report-item-detail-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease;
+}
+
+.rac-report-item-detail-wrapper.is-open {
+  grid-template-rows: 1fr;
+}
+
+.rac-report-item-detail-inner {
+  overflow: hidden;
+}
+
+.rac-report-item-detail {
+  font-family: var(--rac-font-family);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--rac-gray-900);
+  line-height: 20px;
+  width: 100%;
+  margin: 0;
+  padding-top: 2px;
+}
+
+/* =============================================================================
+   SECTION 22: RESUME TEMPLATE (paper-like preview, Merriweather)
+   Matches Figma node 2069:437 "resume preview container" /
+   2069:439 "templates/resume"
+   ============================================================================= */
+
+.rac-resume-template-wrapper {
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.rac-resume-paper {
+  background: white;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 49px 53px;
+  font-family: 'Merriweather', Georgia, serif;
+  color: #111827;
+  box-sizing: border-box;
+}
+
+/* ── Header: name + contact row ── */
+
+.rac-tmpl-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.rac-tmpl-name {
+  font-family: 'Merriweather', Georgia, serif;
+  font-weight: 700;
+  font-size: 19.8px;
+  color: #111827;
+  text-align: center;
+  width: 100%;
+  margin: 0;
+  line-height: normal;
+}
+
+.rac-tmpl-contact-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.rac-tmpl-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.rac-tmpl-contact-icon {
+  font-size: 8px;
+  color: #111827;
+}
+
+.rac-tmpl-contact-text {
+  font-family: 'Merriweather', Georgia, serif;
+  font-weight: 400;
+  font-size: 9px;
+  color: #111827;
+  white-space: nowrap;
+}
+
+/* ── Section divider ── */
+
+.rac-tmpl-divider {
+  width: 100%;
+  height: 0;
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+/* ── Section (wrapper + header + content) ── */
+
+.rac-tmpl-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.rac-tmpl-section-header {
+  border-bottom: 2px solid #111827;
+  padding-bottom: 4px;
+  width: 100%;
+}
+
+.rac-tmpl-section-title {
+  font-family: 'Merriweather', Georgia, serif;
+  font-weight: 700;
+  font-size: 13.8px;
+  color: #111827;
+  text-transform: uppercase;
+  letter-spacing: 0.276px;
+  line-height: normal;
+  margin: 0;
+}
+
+/* ── Summary ── */
+
+.rac-tmpl-summary-text {
+  font-family: 'Merriweather', Georgia, serif;
+  font-weight: 300;
+  font-size: 10.2px;
+  color: #111827;
+  line-height: 16px;
+  width: 100%;
+  margin: 0;
+}
+
+/* ── Experience / Projects entries ── */
+
+.rac-tmpl-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  width: 100%;
+}
+
+.rac-tmpl-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.rac-tmpl-entry-title {
+  font-family: 'Merriweather', Georgia, serif;
+  font-weight: 700;
+  font-size: 12px;
+  color: #111827;
+  line-height: 16px;
+  width: 100%;
+  margin: 0;
+}
+
+.rac-tmpl-bullets {
+  display: block;
+  font-family: 'Merriweather', Georgia, serif;
+  font-weight: 300;
+  font-size: 10.2px;
+  color: #111827;
+  list-style: disc;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.rac-tmpl-bullets li {
+  margin-bottom: 0;
+  margin-left: 15.3px;
+  line-height: 16px;
+}
+
+.rac-tmpl-bullets li span {
+  line-height: 16px;
+}
+
+/* ── Education / Certification / Skills entries ── */
+
+.rac-tmpl-simple-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.rac-tmpl-simple-entry {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* ── Responsive: stack columns on narrow viewports ── */
+
+@media (max-width: 768px) {
+  .rac-checker--report {
+    padding: 16px;
+  }
+
+  .rac-report-body {
+    flex-direction: column;
+  }
+
+  .rac-report-left {
+    width: 100%;
+  }
+}
