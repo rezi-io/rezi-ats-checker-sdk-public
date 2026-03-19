@@ -2292,19 +2292,15 @@
   color: #111827;
   list-style: disc;
   margin: 0;
-  padding: 0;
+  padding-left: 15.3px;
   width: 100%;
 }
 
-.rac-tmpl-bullets li {
-  margin-bottom: 0;
-  margin-left: 15.3px;
-  line-height: 16px;
+ 
+.rac-tmpl-bullets li::marker {
+  font-size: 6px;
 }
-
-.rac-tmpl-bullets li span {
-  line-height: 16px;
-}
+ 
 
 /* ── Education / Certification / Skills entries ── */
 
