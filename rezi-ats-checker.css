@@ -233,10 +233,10 @@
   background: var(--rac-primary-light);
 }
 
-/* File ready state: keep dashed border, no green, compact height, content centered */
+/* File ready state: keep dashed border, compact, content centered */
 .rac-upload-zone.has-file {
   min-height: unset;
-  padding: var(--rac-space-4) var(--rac-space-4);
+  padding: var(--rac-space-6) var(--rac-space-4);
   cursor: default;
   justify-content: center;
 }
@@ -376,20 +376,29 @@
   text-align: center;
 }
 
-/* File ready state: icon + filename row */
+/* File ready state: container + icon + filename row */
+.rac-upload-file-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rac-space-2);
+  width: 100%;
+}
+
 .rac-upload-file-row {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: var(--rac-space-2);
   white-space: nowrap;
 }
 
 .rac-upload-file-icon {
-  font-size: var(--rac-font-size-2xl);  /* 24px */
+  font-size: 24px;
   color: var(--rac-primary);
-  line-height: 1;
+  line-height: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .rac-upload-filename {
@@ -397,6 +406,7 @@
   font-family: var(--rac-font-family);
   font-size: var(--rac-font-size-base);
   font-weight: var(--rac-font-weight-semibold);
+  line-height: 1.5;
   color: var(--rac-gray-900);
   overflow: hidden;
   text-overflow: ellipsis;
